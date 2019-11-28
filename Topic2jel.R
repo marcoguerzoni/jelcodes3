@@ -29,6 +29,7 @@ ap_top_terms <- ap_topics %>%
   ungroup() %>%
   arrange(topic, -beta)
 
+
 ap_top_terms %>%
   mutate(term = reorder(term, beta)) %>%
   ggplot(aes(term, beta, fill = factor(topic))) +
@@ -96,7 +97,7 @@ heatmap(matrix) #, Colv = NA, Rowv = NA, col = terrain.colors(256))
 
 
 png(filename="topic2jel.png")
-print(levelplot(matrix , xlab = NULL , ylab = NULL , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right",tick.number = 10)))
+print(levelplot(matrix, xlab = NULL , ylab = NULL , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right",tick.number = 10)))
 dev.off()
 
 #visualizing
@@ -231,3 +232,21 @@ plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", lab
      edge.lty="solid",
 edge.curved=0.2 ) 
 dev.off()
+
+################new way to cmpute similarity
+colSums(matrix)
+rowSums(matrix)
+
+matrix2<-matrix(,nrow=nrow(matrix), ncol=ncol(matrix)) 
+rownames(matrix2) = rownames(matrix)
+colnames(matrix2) = colnames(matrix)
+for (i in 1:nrow(matrix)) {
+  for (j in 1:ncol(matrix)) {
+matrix2[i,j]<-matrix[i,j]/mean(matrix[i,])
+  }
+  }
+
+png(filename="topic2jel.png")
+print(levelplot(matrix2, xlab = NULL , ylab = NULL , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right",tick.number = 10)))
+dev.off()
+
