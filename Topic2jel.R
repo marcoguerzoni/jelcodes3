@@ -25,7 +25,7 @@ top_terms <- ap_topics  %>% # take the topics data frame and..
 
 ap_top_terms <- ap_topics %>%
   group_by(topic) %>%
-  top_n(10, beta) %>%
+  top_n(50, beta) %>%
   ungroup() %>%
   arrange(topic, -beta)
 
@@ -131,7 +131,7 @@ a <- cosine(ap_lda.terms, y = NULL)
 ap_lda.terms <- as.matrix(terms(ap_lda,50))
 write.csv(ap_lda.terms,file=paste("LDAGibbs",50,"TopicsToTerms.csv"))
 
-ap_lda.terms <- as.matrix(terms(ap_lda,50))
+ap_lda.terms <- as.matrix(terms(ap_lda,1000))
 a <- split(ap_topics, ap_topics$topic)
 b<- a[[1]][[2]]
 b<-sapply(a, '[[',3)

@@ -302,6 +302,10 @@ corp <- tm_map(corp, content_transformer(gsub), pattern = "transpeffort",replace
 corp <- tm_map(corp, content_transformer(gsub), pattern = "expeffort",replacement = "export")
 corp <- tm_map(corp, content_transformer(gsub), pattern = "repeffort",replacement = "report")
 
+corp  <- tm_map(corp , removeWords, c("com","pro","tion","robert","outcom","york","jame","john","abl","ture","articl","sion","richard","michael","william","chicago"))
+
+
+
 #create a dtm and clean
 dtm <- DocumentTermMatrix(corp,control = list(tolower = TRUE, removePunctuation = TRUE, removeNumbers= TRUE,stemming = TRUE ,stopwords = TRUE,minWordLength = 3))
 dtm1<-removeSparseTerms(dtm, 0.98)
@@ -440,7 +444,7 @@ save(ap_lda1, file = "ldamodel.Rdata")
 #ldavis, the function topcimodel2LDAvis is source() at the begining
 serVis(topicmodels2LDAvis(ap_lda1),  out.dir = 'vis')
 
-
+serVis(topicmodels2LDAvis(ap_lda1))
 #library(tidytext)
 
 #ap_topics <- tidy(ap_lda, matrix = "beta")
