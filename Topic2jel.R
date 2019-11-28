@@ -25,7 +25,7 @@ top_terms <- ap_topics  %>% # take the topics data frame and..
 
 ap_top_terms <- ap_topics %>%
   group_by(topic) %>%
-  top_n(50, beta) %>%
+  top_n(10, beta) %>%
   ungroup() %>%
   arrange(topic, -beta)
 
@@ -60,6 +60,10 @@ data[,"class"]<-substr(data[,"Level1"], 1, 1)
 FINALE <- cbind(data, documents_wide)
 write.csv(FINALE, "datasetcompleto.csv") 
 
+
+FINALE$ID[471]
+FINALE$'1'[471]
+documents_wide$`1`[471]
 # M<-as.data.frame(cbind(data$ID,a))
 # M[,3]<-data$ID
 # length(levels(data$ID))
@@ -157,16 +161,21 @@ graph1 <- delete_edges(graph1, E(graph1)[weight<0.25])
 V(graph1)$size <-(prevalence$'colSums(theta)')/10
 E(graph1)$width <- E(graph1)$weight*7
 l <- layout_with_fr(graph1)
+png(filename="Topicnetwork.png")
 plot(graph1,  remove.multiple = T,edge.color="gray40", vertex.color="orange", layout=l, vertex.label.color="black", main="Topic Proximity Network (cutoff=0.25)")
-
+dev.off()
 
 net2 <- graph_from_incidence_matrix(matrix, weighted=TRUE)
-V(net2)
+
+s<-c(rep("Topic",27), rep("JEL", 19))
+col<-c(rep("blue",27), rep("red", 19))
+shape<-c(rep("square",27), rep("circle", 19))
+V(net2)$cluster<-s
 V(net2)$type<-class3
 
-V(net2)$color <- c("steel blue", "orange")
+V(net2)$color <- col
 
-V(net2)$shape <- c("square", "circle")
+V(net2)$shape <- shape
 
 V(net2)$label <- ""
 
@@ -178,4 +187,47 @@ V(net2)$label.font=2
 
 
 net3 <- delete_edges(net2, E(net2)[weight<0.10])
-plot(net3, edge.width = E(net2)$weight, vertex.label.color="white", vertex.size=10, layout=layout_as_bipartite) 
+png(filename="topic2jel.png")
+plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", label.cex=8 ,vertex.size=5, vertex.shape=shape, layout=layout_as_bipartite,  asp=0.45, margin=-0.2, vertex.frame.color = "blue",                 # Node border color
+                          # One of "none", "circle", "square", "csquare", "rectangle" "crectangle", "vrectangle", "pie", "raster", or "sphere"
+                                 # The second size of the node (e.g. for a rectangle)
+     
+     # === vertex label
+                     # Character vector used to label the nodes
+     vertex.color = "red",
+                  # Font family of the label (e.g."Times", "Helvetica")
+     vertex.label.font=2,                          # Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol
+     vertex.label.cex=0.5,                           # Font size (multiplication factor, device-dependent)
+     vertex.label.dist=0,                          # Distance between the label and the vertex
+     vertex.label.degree=0 ,                       # The position of the label in relation to the vertex (use pi)
+     
+     # === Edge
+     edge.color="blue",                           # Edge color
+                                     # Edge width, defaults to 1
+     edge.arrow.size=1,                            # Arrow size, defaults to 1
+     edge.arrow.width=1,                           # Arrow width, defaults to 1
+     edge.lty="dashed") 
+dev.off()
+
+png(filename="JELandTOPIC.png")
+plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", label.cex=8 ,vertex.size=5, vertex.shape=shape,  asp=0.45, margin=-0.2, vertex.frame.color = "blue",                 # Node border color
+     # One of "none", "circle", "square", "csquare", "rectangle" "crectangle", "vrectangle", "pie", "raster", or "sphere"
+     # The second size of the node (e.g. for a rectangle)
+     
+     # === vertex label
+     # Character vector used to label the nodes
+     vertex.color = col,
+     # Font family of the label (e.g."Times", "Helvetica")
+     vertex.label.font=2,                          # Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol
+     vertex.label.cex=0.5,                           # Font size (multiplication factor, device-dependent)
+     vertex.label.dist=0,                          # Distance between the label and the vertex
+     vertex.label.degree=0 ,                       # The position of the label in relation to the vertex (use pi)
+     
+     # === Edge
+     edge.color="blue",                           # Edge color
+     # Edge width, defaults to 1
+     edge.arrow.size=1,                            # Arrow size, defaults to 1
+     edge.arrow.width=1,                           # Arrow width, defaults to 1
+     edge.lty="solid",
+edge.curved=0.2 ) 
+dev.off()
