@@ -96,7 +96,7 @@ matrix <- t(theta_mean)
 heatmap(matrix) #, Colv = NA, Rowv = NA, col = terrain.colors(256))
 
 
-png(filename="topic2jel.png")
+png(filename="topic2jel2.png")
 print(levelplot(matrix, xlab = NULL , ylab = NULL , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right",tick.number = 10)))
 dev.off()
 
