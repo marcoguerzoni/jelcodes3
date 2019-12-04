@@ -68,6 +68,7 @@ txt <- text
 #i create a corpus and a dcument ter line. I check which documents have zero entries
 #they have zero sicne pdf_text did not work, therefore need ocr.
 corp <- Corpus(VectorSource(txt))
+
 dtm <- DocumentTermMatrix(corp,control = list(tolower = TRUE, removePunctuation = TRUE, removeNumbers= TRUE,stemming = TRUE ,stopwords = TRUE,minWordLength = 3))
 rowTotals <- apply(dtm, 2, sum) #Find the sum of words in each Document
 check<-which(rowTotals==0, arr.ind=TRUE)
@@ -106,98 +107,10 @@ summary(txt)
 ###change directory two analysis 
 ###upload stopwords and words to erase stop words are collected inv arious files
 
-stopA<-read.csv("stopA.csv", sep=";", fileEncoding="latin1")
-stopA1<-read.csv("stopA1.csv", sep=";", fileEncoding="latin1")
-stop<-read.csv("stopwordseng.csv", sep=";", fileEncoding="latin1")
-stopEM<-read.csv("stopEM.csv", sep=";",fileEncoding="latin1")
-stopF<-read.csv("stopF.csv", sep=";")
-stopGH<-read.csv("stopGH.csv", sep=";")
-stopI<-read.csv("stopI.csv", sep=";")
-stopL<-read.csv("stopL.csv", sep=",")
-
-
-#clean stopwordsfile
-
-stop <- toString(stop[,1])
-#stop <- removePunctuation(stop ,preserve_intra_word_dashes = TRUE)
-stop <- strsplit(stop, "[[:space:]]+")
-stop <- unlist(stop)
-stop <- removePunctuation(stop ,preserve_intra_word_dashes = TRUE)
-stop <- removeNumbers(stop)
-stop<- tolower(stop)
-
-stopA <- apply(stopA, 2, toString)
-stopA<- stripWhitespace(stopA)
-#stopA <- removePunctuation(stopA ,preserve_intra_word_dashes = TRUE)
-stopA<- stripWhitespace(stopA)
-stopA <- strsplit(stopA, "[[:space:]]+")
-stopA <- unlist(stopA)
-stopA <- removePunctuation(stopA ,preserve_intra_word_dashes = TRUE)
-stopA <- removeNumbers(stopA)
-stopA<- tolower(stopA)
-
-
-stopA1 <- apply(stopA1, 2, toString)
-stopA1<- stripWhitespace(stopA1)
-#stopA1 <- removePunctuation(stopA1 ,preserve_intra_word_dashes = TRUE)
-stopA1 <- strsplit(stopA1, "[[:space:]]+")
-stopA1 <- unlist(stopA1)
-stopA1 <- removePunctuation(stopA1 ,preserve_intra_word_dashes = TRUE)
-stopA1 <- removeNumbers(stopA1)
-stopA1<- tolower(stopA1)
-
-
-stopEM <- apply(stopEM, 2, toString)
-stopEM<- stripWhitespace(stopEM)
-#stopEM <- removePunctuation(stopEM ,preserve_intra_word_dashes = TRUE)
-stopEM <- strsplit(stopEM, "[[:space:]]+")
-stopEM<- unlist(stopEM)
-stopEM <- removePunctuation(stopEM ,preserve_intra_word_dashes = TRUE)
-stopEM <- removeNumbers(stopEM)
-stopEM<- tolower(stopEM)
-
-
-stopF <- apply(stopF, 2, toString)
-stopF<- stripWhitespace(stopF)
-#stopF <- removePunctuation(stopF ,preserve_intra_word_dashes = TRUE)
-stopF<- strsplit(stopF, "[[:space:]]+")
-stopF<- unlist(stopF)
-stopF <- removePunctuation(stopF ,preserve_intra_word_dashes = TRUE)
-stopF<- removeNumbers(stopF)
-stopF<- tolower(stopF)
-
-stopGH <- apply(stopGH, 2, toString)
-stopGH<- stripWhitespace(stopGH)
-#stopGH <- removePunctuation(stopGH ,preserve_intra_word_dashes = TRUE)
-stopGH<- strsplit(stopGH, "[[:space:]]+")
-stopGH<- unlist(stopGH)
-stopGH <- removePunctuation(stopGH ,preserve_intra_word_dashes = TRUE)
-stopGH<- removeNumbers(stopGH)
-stopGH<- tolower(stopGH)
-
-
-stopI <- apply(stopI, 2, toString)
-stopI<- stripWhitespace(stopI)
-#stopI <- removePunctuation(stopI ,preserve_intra_word_dashes = TRUE)
-stopI<- strsplit(stopI, "[[:space:]]+")
-stopI<- unlist(stopI)
-stopI <- removePunctuation(stopI ,preserve_intra_word_dashes = TRUE)
-stopI<- removeNumbers(stopI)
-stopI<- tolower(stopI)
-
-
-stopL <- apply(stopL, 2, toString)
-stopL<- stripWhitespace(stopL)
-stopL <- removePunctuation(stopL ,preserve_intra_word_dashes = TRUE)
-stopL<- strsplit(stopL, "[[:space:]]+")
-stopL<- unlist(stopL)
-stopL <- removePunctuation(stopL ,preserve_intra_word_dashes = TRUE)
-stopL<- removeNumbers(stopL)
-stopL<- tolower(stopL)
 
 ####stop and stopA### word to remove
 
-txt<-txt3
+
 txt <- gsub("^[[:space:]]+", "", txt) # remove whitespace at beginning of documents
 txt <- gsub("[[:space:]]+$", "", txt) # remove whitespace at end of documents
 txt<-gsub("http[^[:space:]]*", "", txt)
@@ -207,30 +120,26 @@ txt<-stringi::stri_trans_general(txt, "latin-ascii")
 txt <- gsub("[^\x20-\x7E]", "", txt)
 
 txt <- replace_non_ascii(txt, replacement = "", remove.nonconverted = TRUE)
-
 txt <- gsub("-","", txt,ignore.case=T)
 txt <- removePunctuation(txt,preserve_intra_word_dashes = FALSE)
 txt <- removeNumbers(txt)
 txt <- stripWhitespace(txt)
 txt<- tolower(txt)
 
-
+load("stopwords.Rdata")
 #
 #create a corpus
 corp <- Corpus(VectorSource(txt))
 
 
 ######CLEAN CORPUS
-corp  <- tm_map(corp , removeWords, stopA)
-corp  <- tm_map(corp , removeWords, stopA1)
-corp  <- tm_map(corp , removeWords, stopEM)
-corp  <- tm_map(corp , removeWords, stopF)
-corp  <- tm_map(corp , removeWords, stopGH)
-corp  <- tm_map(corp , removeWords, stopI)
-corp  <- tm_map(corp , removeWords, stopL)
+corp  <- tm_map(corp , removeWords, STOP)
+
 corp  <- tm_map(corp , removeWords, c("download", "cognetti"))
 
-
+dtm <- DocumentTermMatrix(corp)
+sum(dtm)
+dim(dtm)
 corp  <- tm_map(corp , stemDocument)
 corp <- tm_map(corp,stripWhitespace)
 corp <- tm_map(corp,removeWords,stopwords("en"))
@@ -301,6 +210,8 @@ corp <- tm_map(corp, content_transformer(gsub), pattern = "exibl",replacement = 
 corp <- tm_map(corp, content_transformer(gsub), pattern = "transpeffort",replacement = "transport")
 corp <- tm_map(corp, content_transformer(gsub), pattern = "expeffort",replacement = "export")
 corp <- tm_map(corp, content_transformer(gsub), pattern = "repeffort",replacement = "report")
+corp <- tm_map(corp, content_transformer(gsub), pattern = "speffort",replacement = "effort")
+corp <- tm_map(corp, content_transformer(gsub), pattern = "peffortugal",replacement = "portugal")
 
 corp  <- tm_map(corp , removeWords, c("com","pro","tion","robert","outcom","york","jame","john","abl","ture","articl","sion","richard","michael","william","chicago"))
 
@@ -308,7 +219,7 @@ corp  <- tm_map(corp , removeWords, c("com","pro","tion","robert","outcom","york
 
 #create a dtm and clean
 dtm <- DocumentTermMatrix(corp,control = list(tolower = TRUE, removePunctuation = TRUE, removeNumbers= TRUE,stemming = TRUE ,stopwords = TRUE,minWordLength = 3))
-dtm1<-removeSparseTerms(dtm, 0.98)
+dtm1<-removeSparseTerms(dtm, 0.97)
 dtm1 <- removeCommonTerms(dtm1 ,0.8)
 library(topicmodels)
 
