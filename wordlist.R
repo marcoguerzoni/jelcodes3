@@ -120,5 +120,10 @@ STOP<- removeNumbers(STOP)
 STOP <- as.vector(STOP)
 STOP <- STOP[which(STOP!="na")]
 STOP <- STOP[which(STOP!="")]
+STOP <- STOP[which(STOP!="")]
+
+#adjusting for some words I wnat to retain
+retain <- c("eputational", "espondent", "espondents", "healthca", "coeffiecient", "school", "wellbeing", "option", "dolla", "choice", "egion")
+STOP <- STOP[!STOP %in% retain]
 
 save(STOP, file="stopwords.Rdata")
