@@ -1,3 +1,5 @@
+#set directory to file location
+
 library(topicmodels)
 
 library(tidytext)
@@ -62,9 +64,11 @@ FINALE <- cbind(data, documents_wide)
 write.csv(FINALE, "datasetcompleto.csv") 
 
 
-FINALE$ID[471]
+FINALE$ID[89]
 FINALE$'1'[471]
-documents_wide$`1`[471]
+documents_wide$`1`[1652]
+a[89]
+
 # M<-as.data.frame(cbind(data$ID,a))
 # M[,3]<-data$ID
 # length(levels(data$ID))
@@ -169,10 +173,11 @@ dev.off()
 net2 <- graph_from_incidence_matrix(matrix, weighted=TRUE)
 
 s<-c(rep("Topic",27), rep("JEL", 19))
+tt<-c(rep("TRUE",27), rep("FALSE", 19))
 col<-c(rep("blue",27), rep("red", 19))
 shape<-c(rep("square",27), rep("circle", 19))
 V(net2)$cluster<-s
-V(net2)$type<-class3
+V(net2)$type<-tt
 
 V(net2)$color <- col
 
@@ -187,9 +192,11 @@ V(net2)$label.cex=.4
 V(net2)$label.font=2
 
 
-net3 <- delete_edges(net2, E(net2)[weight<0.10])
-png(filename="topic2jel.png")
-plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", label.cex=8 ,vertex.size=5, vertex.shape=shape, layout=layout_as_bipartite,  asp=0.45, margin=-0.2, vertex.frame.color = "blue",                 # Node border color
+
+net3 <- delete_edges(net2, E(net2)[weight<0.09])
+png(filename="topic2jel09.png")
+
+plot(net3, types=V(net3)$type,  vertex.label.color="white", label.cex=8 ,vertex.size=7, vertex.shape=shape, layout=layout_as_bipartite,  asp=0.45, margin=0, vertex.frame.color = "blue",                 # Node border color
      # One of "none", "circle", "square", "csquare", "rectangle" "crectangle", "vrectangle", "pie", "raster", or "sphere"
      # The second size of the node (e.g. for a rectangle)
      
@@ -198,7 +205,7 @@ plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", lab
      vertex.color = "red",
      # Font family of the label (e.g."Times", "Helvetica")
      vertex.label.font=2,                          # Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol
-     vertex.label.cex=0.5,                           # Font size (multiplication factor, device-dependent)
+     vertex.label.cex=0.7,                           # Font size (multiplication factor, device-dependent)
      vertex.label.dist=0,                          # Distance between the label and the vertex
      vertex.label.degree=0 ,                       # The position of the label in relation to the vertex (use pi)
      
@@ -211,7 +218,7 @@ plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", lab
 dev.off()
 
 png(filename="JELandTOPIC.png")
-plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", label.cex=8 ,vertex.size=5, vertex.shape=shape,  asp=0.45, margin=-0.2, vertex.frame.color = "blue",                 # Node border color
+plot(net3,  vertex.label.color="white", label.cex=8 ,vertex.size=6, vertex.shape=shape,  asp=0.45, margin=-0.1, vertex.frame.color = "blue",                 # Node border color
      # One of "none", "circle", "square", "csquare", "rectangle" "crectangle", "vrectangle", "pie", "raster", or "sphere"
      # The second size of the node (e.g. for a rectangle)
      
@@ -220,7 +227,7 @@ plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", lab
      vertex.color = col,
      # Font family of the label (e.g."Times", "Helvetica")
      vertex.label.font=2,                          # Font: 1 plain, 2 bold, 3, italic, 4 bold italic, 5 symbol
-     vertex.label.cex=0.5,                           # Font size (multiplication factor, device-dependent)
+     vertex.label.cex=0.8,                           # Font size (multiplication factor, device-dependent)
      vertex.label.dist=0,                          # Distance between the label and the vertex
      vertex.label.degree=0 ,                       # The position of the label in relation to the vertex (use pi)
      
@@ -232,6 +239,11 @@ plot(net3 ,edge.width = 500*(E(net2)$weight^2),  vertex.label.color="white", lab
      edge.lty="solid",
      edge.curved=0.2 ) 
 dev.off()
+
+
+
+
+plot(net3)
 
 ################new way to cmpute similarity
 colSums(matrix)
