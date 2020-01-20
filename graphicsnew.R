@@ -4,9 +4,86 @@ library(topicmodels)
 
 library(tidytext)
 library(tidyr)
+load("ldamodel.Rdata")
+
+
+#take the OLD model and create dataset of topics
+ap_lda<-ap_lda1
+ap_topics <- tidy(ap_lda, matrix = "beta")
+topics_old <- ap_topics %>% spread(term, beta)
+
 load("ldamodelnewbis.Rdata")
 ap_lda<-ap_lda1
 ap_topics <- tidy(ap_lda, matrix = "beta")
+topics_new <- ap_topics %>% spread(term, beta)
+
+varold<-colnames(topics_old)
+varnew<-colnames(topics_new)
+
+newvar <- setdiff(varnew,varold)
+newvar1 <- setdiff(varold,varnew)
+interse<-intersect(varnew,varold)
+
+dfnewvar <- data.frame(matrix(ncol = 154, nrow = 27))
+colnames(dfnewvar) <- newvar
+dfnewvar[is.na(dfnewvar)]<- 0
+
+dfnewvar1 <- data.frame(matrix(ncol = 49, nrow = 27))
+colnames(dfnewvar1) <- newvar1
+dfnewvar1[is.na(dfnewvar1)]<- 0
+
+new <- cbind(topics_new, dfnewvar1)
+new <- new[ , order(names(new))]
+
+old <- cbind(topics_old, dfnewvar)
+old <- old[ , order(names(old))]
+
+total<- rbind(old, new)
+totalsame <-  rbind(old, old)
+
+totalt <- t(total)
+totaltsame <- t(totalsame)
+
+
+library(lsa)
+a <-cosine(totalt)
+b <-cosine(totaltsame)
+
+similarity  <- a[1:27, 28:54]
+similaritysame  <- b[1:27, 28:54]
+
+library(lattice)
+heatmap(similarity)
+
+max <- apply(similarity, 1, which.max)
+print(levelplot(similarity, xlab = NULL , ylab = NULL , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right",tick.number = 10)))
+
+
+print(levelplot(t(similaritynew), xlab = "Old Classification" , ylab = "New Classification" , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right", tick.number = 10)))
+print(levelplot(t(similaritynew2), xlab = "Old Classification" , ylab = "Old Classification" , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right", tick.number = 10)))
+
+
+
+library(igraph)
+graph1 <- graph_from_incidence_matrix(similarity, weighted= TRUE)  
+graph1 <- graph_from_incidence_matrix(similaritysame, weighted= TRUE)
+
+graph1 <- delete_edges(graph1, E(graph1)[weight<0.50])
+
+numbertopics<-27
+
+tt<-c(rep("TRUE",numbertopics), rep("FALSE", numbertopics))
+col<-c(rep("blue",numbertopics), rep("red", 19))
+shape<-c(rep("square",numbertopics), rep("circle", 19))
+labels <- c(rep(1:27,2))
+
+
+V(graph1)$type<-tt
+
+plot(graph1, types=V(graph1)$type,vertex.label=labels, vertex.size=7, layout=layout_as_bipartite) 
+
+
+
 documents <- tidy(ap_lda, matrix = "gamma")
 documents_wide <- documents %>% spread(topic, gamma)
 documents_wide <- documents_wide[order(as.integer(documents_wide$document)),] 
@@ -21,7 +98,7 @@ library(dplyr)
 
 top_terms <- ap_topics  %>% # take the topics data frame and..
   group_by(topic) %>% # treat each topic as a different group
-  top_n(20, beta) %>% # get the top 10 most informative words
+  top_n(10, beta) %>% # get the top 10 most informative words
   ungroup() %>% # ungroup
   arrange(topic, -beta) # arrange words in descending informativeness
 
@@ -265,3 +342,19 @@ for (i in 1:nrow(matrix)) {
 png(filename="topic2jel.png")
 print(levelplot(matrix2, xlab = NULL , ylab = NULL , scales = list(tck = 1, x = list(rot = 45)), col.regions = gray (27:0/27), colorkey = list(space = "right",tick.number = 10)))
 dev.off()
+
+
+matrix.sort <- function(matrix) {
+  
+  if (nrow(matrix) != ncol(matrix)) stop("Not diagonal")
+  if(is.null(rownames(matrix))) rownames(matrix) <- 1:nrow(matrix)
+  
+  row.max <- apply(matrix,1,which.max)
+  if(all(table(row.max) != 1)) stop("Ties cannot be resolved")
+  
+  matrix[names(sort(row.max)),]
+}
+ 
+
+similaritynew<-matrix.sort(t(similarity))
+similaritynew2<-matrix.sort(t(similaritysame))
