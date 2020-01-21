@@ -12,7 +12,7 @@ ap_lda<-ap_lda1
 ap_topics <- tidy(ap_lda, matrix = "beta")
 topics_old <- ap_topics %>% spread(term, beta)
 
-load("ldamodelnewbis.Rdata")
+load("ldamodelnewbis1.Rdata")
 ap_lda<-ap_lda1
 ap_topics <- tidy(ap_lda, matrix = "beta")
 topics_new <- ap_topics %>% spread(term, beta)
@@ -48,8 +48,8 @@ totaltsame <- t(totalsame)
 library(lsa)
 a <-cosine(totalt)
 b <-cosine(totaltsame)
-
-similarity  <- a[1:27, 28:54]
+c <-cosine(totalt)
+similarity  <- c[1:27, 28:54]
 similaritysame  <- b[1:27, 28:54]
 
 library(lattice)
@@ -88,6 +88,20 @@ documents <- tidy(ap_lda, matrix = "gamma")
 documents_wide <- documents %>% spread(topic, gamma)
 documents_wide <- documents_wide[order(as.integer(documents_wide$document)),] 
 #28 is 27 (number of topic) plus one
+
+
+plotpaper<-t(documents_wide[612,2:28])
+names<-as.factor(c(1:27))
+
+
+
+plot<- as.data.frame(cbind(plotpaper, names))
+colnames(plot)<-c("value","Topics")  
+fig <- ggplot(plot, aes(x=names, y=plotpaper)) + geom_bar(stat="identity")
+fig <- fig + xlab("Topics")
+fig <- fig + ylab("Probability")
+
+
 documents_wide$max <- apply(documents_wide[2:28], 1, which.max)
 
 ap_lda$beta
@@ -358,3 +372,55 @@ matrix.sort <- function(matrix) {
 
 similaritynew<-matrix.sort(t(similarity))
 similaritynew2<-matrix.sort(t(similaritysame))
+
+
+FINALE2 <- FINALE[,30:58]
+
+codici <- unique(FINALE2$class)
+
+for (i in 1:length(codici)){
+  
+  final3<- FINALE2[which(FINALE2$class==codici[i]),3:29]
+  final3 <- gather(final3, topic, value, 1:27, factor_key=TRUE)
+
+   plot <- ggplot(final3, aes(x=topic, y=value)) +
+    geom_boxplot() +
+    geom_jitter(color="red", size=0.4, alpha=0.9) +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=14), 
+      axis.title.x = element_text(size = 14, hjust=0.5),
+      axis.title.y = element_text(size = 14, hjust=0.5)
+      
+    ) +
+    ggtitle(paste('JEL ', codici[i])) + xlab('\nTopics') + ylab('Probability\n')
+  
+   png(filename=paste("Distribution Jel_", codici[i], ".png"), width = 680, height = 480)
+   print(plot)
+   dev.off()  
+   print(i)
+}
+
+
+
+
+final3<- FINALE2[which(FINALE2$class=="A"),3:29]
+final3 <- gather(final3, topic, value, 1:27, factor_key=TRUE)
+final3 %>%
+  ggplot( aes(x=topic, y=value)) +
+  geom_boxplot() +
+  geom_jitter(color="red", size=0.4, alpha=0.9) +
+  theme_ipsum() +
+  theme(
+    legend.position="none",
+    plot.title = element_text(size=14), 
+    axis.title.x = element_text(size = 14, hjust=0.5),
+    axis.title.y = element_text(size = 14, hjust=0.5)
+    
+  ) +
+  ggtitle("JEL A") + xlab('\nTopics') + ylab('Probability\n')
+
+
+ylab("Probability")
+
