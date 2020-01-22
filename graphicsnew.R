@@ -12,7 +12,7 @@ ap_lda<-ap_lda1
 ap_topics <- tidy(ap_lda, matrix = "beta")
 topics_old <- ap_topics %>% spread(term, beta)
 
-load("ldamodelnewbis1.Rdata")
+load("ldamodelnew.Rdata")
 ap_lda<-ap_lda1
 ap_topics <- tidy(ap_lda, matrix = "beta")
 topics_new <- ap_topics %>% spread(term, beta)
@@ -24,11 +24,11 @@ newvar <- setdiff(varnew,varold)
 newvar1 <- setdiff(varold,varnew)
 interse<-intersect(varnew,varold)
 
-dfnewvar <- data.frame(matrix(ncol = 154, nrow = 27))
+dfnewvar <- data.frame(matrix(ncol = 39, nrow = 27))
 colnames(dfnewvar) <- newvar
 dfnewvar[is.na(dfnewvar)]<- 0
 
-dfnewvar1 <- data.frame(matrix(ncol = 49, nrow = 27))
+dfnewvar1 <- data.frame(matrix(ncol = 26, nrow = 27))
 colnames(dfnewvar1) <- newvar1
 dfnewvar1[is.na(dfnewvar1)]<- 0
 
@@ -49,7 +49,7 @@ library(lsa)
 a <-cosine(totalt)
 b <-cosine(totaltsame)
 c <-cosine(totalt)
-similarity  <- c[1:27, 28:54]
+similarity  <- a[1:27, 28:54]
 similaritysame  <- b[1:27, 28:54]
 
 library(lattice)
@@ -424,3 +424,11 @@ final3 %>%
 
 ylab("Probability")
 
+
+
+plotbis<- as.data.frame(cbind(theta[1692,], as.factor(c(1:27))))
+colnames(plotbis)<-c("value","Topics")  
+fig <- ggplot(plotbis, aes(x=Topics, y=value)) + geom_bar(stat="identity")
+fig <- fig + scale_x_discrete(name ="Topics", limits=c(1:27))
+fig <- fig + ylab("Probability")
+fig
